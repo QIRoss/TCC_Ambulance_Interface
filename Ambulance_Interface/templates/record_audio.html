@@ -1,5 +1,4 @@
 <!-- templates/record_audio.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Record Audio</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% load static %}
+    <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+    <script src="{% static 'js/record_audio.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Record Audio</h1>
@@ -17,66 +20,5 @@
     </div>
     <audio controls id="audioPreview"></audio>
     <div id="message"></div>
-
-    <script>
-        let mediaRecorder;
-        let audioChunks = [];
-        let csrfToken = '{{ csrf_token }}'; // Get CSRF token from Django template
-
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
-
-                mediaRecorder.addEventListener("dataavailable", event => {
-                    audioChunks.push(event.data);
-                });
-
-                mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audioPreview = document.getElementById('audioPreview');
-                    audioPreview.src = audioUrl;
-                    audioPreview.controls = true;
-
-                    const submitButton = document.getElementById('submitAudio');
-                    submitButton.disabled = false;
-                });
-            });
-
-        document.getElementById('startRecording').addEventListener('click', () => {
-            mediaRecorder.start();
-            document.getElementById('startRecording').disabled = true;
-            document.getElementById('stopRecording').disabled = false;
-        });
-
-        document.getElementById('stopRecording').addEventListener('click', () => {
-            mediaRecorder.stop();
-            document.getElementById('startRecording').disabled = false;
-            document.getElementById('stopRecording').disabled = true;
-        });
-
-        document.getElementById('submitAudio').addEventListener('click', () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const formData = new FormData();
-            formData.append('audio', audioBlob);
-
-            $.ajax({
-                url: '/ambulance/record-audio/',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRFToken': csrfToken
-                },
-                success: function(response) {
-                    document.getElementById('message').innerText = JSON.stringify(response);
-                },
-                error: function(xhr, status, error) {
-                    document.getElementById('message').innerHTML = '<p>Error submitting audio!</p>';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
