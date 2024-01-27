@@ -1,8 +1,8 @@
+let mediaRecorder;
+let audioChunks = [];
+let csrfToken = document.getElementById('csrfToken').value;
+
 document.addEventListener('DOMContentLoaded', function() {
-    let mediaRecorder;
-    let audioChunks = [];
-    let csrfToken = document.getElementById('csrfToken').value;
-    
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
@@ -22,22 +22,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = false;
             });
         });
-
-    document.getElementById('startRecording').addEventListener('click', () => {
+    
+    document.getElementById('startRecording').addEventListener('click', function() {
+        audioChunks = [];
+        
         mediaRecorder.start();
         document.getElementById('startRecording').disabled = true;
         document.getElementById('stopRecording').disabled = false;
     });
 
-    document.getElementById('stopRecording').addEventListener('click', () => {
+    document.getElementById('stopRecording').addEventListener('click', function() {
         mediaRecorder.stop();
         document.getElementById('startRecording').disabled = false;
         document.getElementById('stopRecording').disabled = true;
     });
 
-    document.getElementById('submitAudio').addEventListener('click', () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+    document.getElementById('submitAudio').addEventListener('click', function() {
         const formData = new FormData();
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         formData.append('audio', audioBlob);
 
         $.ajax({
