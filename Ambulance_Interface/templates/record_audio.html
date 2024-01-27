@@ -73,7 +73,6 @@
                     document.getElementById('message').innerText = JSON.stringify(response);
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error submitting audio:', error);
                     document.getElementById('message').innerHTML = '<p>Error submitting audio!</p>';
                 }
             });
