@@ -25,10 +25,18 @@ def record_audio(request):
             second_response = requests.get('http://127.0.0.1:2947')
 
             if second_response.status_code == 200:
-                return JsonResponse({
-                    'transcription': response.json(),
-                    'second_response_data': second_response.json()
-                })
+                third_response = requests.get('http://127.0.0.1:9500')
+                if third_response.status_code == 200:
+                    return JsonResponse({
+                        'transcription': response.json(),
+                        'second_response_data': second_response.json(),
+                        'third_response_data': third_response.json()
+                    })
+                else:
+                    return JsonResponse({
+                        'transcription': response.json(),
+                        'error': 'Failed to fetch data from 127.0.0.1:9500'
+                    }, status=500)
             else:
                 return JsonResponse({
                     'transcription': response.json(),
