@@ -11,6 +11,7 @@ RUN apt-get update \
         gcc \
         libpq-dev \
         libmagic1 \
+        ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
